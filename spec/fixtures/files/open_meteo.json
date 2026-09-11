@@ -1,0 +1,7 @@
+{
+  "timezone": "America/New_York",
+  "current_units": { "time": "unixtime", "temperature_2m": "°F" },
+  "current": { "temperature_2m": 72.5, "time": 1789063200 },
+  "daily_units": { "time": "unixtime", "temperature_2m_max": "°F", "temperature_2m_min": "°F" },
+  "daily": { "time": [1789012800], "temperature_2m_max": [78.8], "temperature_2m_min": [64.4] }
+}
