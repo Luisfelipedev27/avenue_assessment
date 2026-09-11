@@ -6,19 +6,25 @@ module Forecasts
       new(**args).call
     end
 
-    def initialize(address:, address_resolver: Addresses::Resolve, client: OpenMeteo::Client.new)
+    def initialize(address:, address_resolver: Addresses::Resolve, client: OpenMeteo::Client.new, cache: Rails.cache)
       @address = address
       @address_resolver = address_resolver
       @client = client
+      @cache = cache
+      @cached = false
     end
 
     def call
-      resolve_address && fetch_forecast
+      resolve_address && load_forecast
       self
     end
 
     def success?
       error_message.blank?
+    end
+
+    def cached?
+      @cached
     end
 
     private
@@ -33,6 +39,17 @@ module Forecasts
       else
         self.error_message = service.error_message
         false
+      end
+    end
+
+    def load_forecast
+      @cached = true
+      self.forecast = @cache.fetch(
+        [ "forecasts", "v1", location.fetch(:country), location.fetch(:postal_code), "F" ],
+        expires_in: 30.minutes, skip_nil: true
+      ) do
+        @cached = false
+        fetch_forecast ? forecast : nil
       end
     end
 

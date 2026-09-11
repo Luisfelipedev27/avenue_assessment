@@ -1,3 +1,5 @@
+require "digest"
+
 module Addresses
   class Resolve
     attr_reader :location, :error_message
@@ -6,13 +8,14 @@ module Addresses
       new(**args).call
     end
 
-    def initialize(address:, client: Nominatim::Client.new)
+    def initialize(address:, client: Nominatim::Client.new, cache: Rails.cache)
       @address = address.is_a?(String) ? address.squish : ""
       @client = client
+      @cache = cache
     end
 
     def call
-      validate_address && resolve_address
+      validate_address && load_location
       self
     end
 
@@ -29,6 +32,13 @@ module Addresses
 
       self.error_message = "Address is required"
       false
+    end
+
+    def load_location
+      key = [ "addresses", "v1", "US", Digest::SHA256.hexdigest(@address.downcase) ]
+      self.location = @cache.fetch(key, expires_in: 30.minutes, skip_nil: true) do
+        resolve_address ? location : nil
+      end
     end
 
     def resolve_address
