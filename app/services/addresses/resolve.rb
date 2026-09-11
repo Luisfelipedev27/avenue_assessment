@@ -28,14 +28,21 @@ module Addresses
     attr_writer :location, :error_message
 
     def validate_address
-      return true if @address.present?
+      if @address.blank?
+        self.error_message = "Address is required"
+        return false
+      end
 
-      self.error_message = "Address is required"
-      false
+      unless @address.match?(/[[:alpha:]]/) && @address.match?(/\d/)
+        self.error_message = "Enter a full street address, including a house number, city and state"
+        return false
+      end
+
+      true
     end
 
     def load_location
-      key = [ "addresses", "v1", "US", Digest::SHA256.hexdigest(@address.downcase) ]
+      key = [ "addresses", "v2", "US", Digest::SHA256.hexdigest(@address.downcase) ]
       self.location = @cache.fetch(key, expires_in: 30.minutes, skip_nil: true) do
         resolve_address ? location : nil
       end
@@ -47,6 +54,15 @@ module Addresses
 
       if results.empty?
         self.error_message = "Address not found"
+        return false
+      end
+
+      if results.any? { |result| !result.is_a?(Hash) || !result["address"].is_a?(Hash) }
+        raise ExternalApis::JsonClient::InvalidResponse
+      end
+
+      if results.map { |result| result["address"]["postcode"] }.uniq.size > 1
+        self.error_message = "Multiple locations found. Include the city and state to narrow your search"
         return false
       end
 
@@ -73,6 +89,11 @@ module Addresses
       postal_code = components["postcode"].to_s.strip
       unless postal_code.match?(/\A\d{5}(?:-\d{4})?\z/)
         self.error_message = "A valid ZIP code could not be found for this address"
+        return false
+      end
+
+      unless components["house_number"].present? && components["road"].present?
+        self.error_message = "A complete street address could not be confirmed. Check the house number, city and state"
         return false
       end
 

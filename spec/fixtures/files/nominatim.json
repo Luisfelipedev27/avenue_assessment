@@ -3,6 +3,14 @@
     "display_name": "Empire State Building, 350, 5th Avenue, Manhattan, New York, 10118, United States",
     "lat": "40.7484421",
     "lon": "-73.9856589",
-    "address": { "postcode": "10118", "country": "United States", "country_code": "us" }
+    "address": {
+      "postcode": "10118",
+      "country": "United States",
+      "country_code": "us",
+      "house_number": "350",
+      "road": "5th Avenue",
+      "city": "New York",
+      "state": "New York"
+    }
   }
 ]

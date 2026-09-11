@@ -10,7 +10,7 @@ module Nominatim
     def geocode(address:)
       @request_gate.call do
         @http_client.get(ENV.fetch("NOMINATIM_URL", "https://nominatim.openstreetmap.org/search"),
-          params: { q: address, format: "jsonv2", addressdetails: 1, countrycodes: "us", limit: 1 },
+          params: { q: address, format: "jsonv2", addressdetails: 1, countrycodes: "us", limit: 2 },
           headers: { "User-Agent" => "AvenueWeather/1.0", "Accept-Language" => "en" })
       end
     end

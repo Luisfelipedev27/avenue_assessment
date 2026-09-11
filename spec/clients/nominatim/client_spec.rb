@@ -13,7 +13,7 @@ RSpec.describe Nominatim::Client do
       expect(request["User-Agent"]).to eq("AvenueWeather/1.0")
       expect(URI.decode_www_form(request.uri.query).to_h).to eq(
         "q" => "350 5th Ave, New York", "format" => "jsonv2",
-        "addressdetails" => "1", "countrycodes" => "us", "limit" => "1"
+        "addressdetails" => "1", "countrycodes" => "us", "limit" => "2"
       )
     end
   end

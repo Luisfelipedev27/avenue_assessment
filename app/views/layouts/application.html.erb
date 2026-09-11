@@ -1,30 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Avenue" %></title>
+    <title>Avenue — Weather at your address</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="Look up current weather and today's high and low for a US address.">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-
-    <%= yield :head %>
-
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="container mx-auto mt-28 px-5 flex">
-      <%= yield %>
-    </main>
+  <body class="min-h-screen bg-stone-50 font-sans text-slate-900 antialiased">
+    <div class="mx-auto flex min-h-screen max-w-6xl flex-col px-5 sm:px-8">
+      <header class="flex items-center justify-between border-b border-stone-200 py-6">
+        <%= link_to "avenue", root_path, class: "rounded text-2xl font-bold tracking-tight text-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-emerald-700" %>
+        <span class="text-xs font-medium tracking-widest text-slate-500 uppercase">Local weather</span>
+      </header>
+
+      <main class="flex-1 py-10 sm:py-16">
+        <%= yield %>
+      </main>
+
+      <footer class="border-t border-stone-200 py-6 text-xs leading-6 text-slate-500">
+        Weather data by <%= link_to "Open-Meteo", "https://open-meteo.com/", class: "underline underline-offset-4 hover:text-emerald-800" %>.
+        Address data © <%= link_to "OpenStreetMap contributors", "https://www.openstreetmap.org/copyright", class: "underline underline-offset-4 hover:text-emerald-800" %> via Nominatim.
+      </footer>
+    </div>
   </body>
 </html>

@@ -21,7 +21,7 @@ RSpec.describe Addresses::Resolve do
 
   it "looks up different addresses independently" do
     resolve
-    resolve("Another address")
+    resolve("20 W 34th Street, New York")
 
     expect(client).to have_received(:geocode).twice
   end

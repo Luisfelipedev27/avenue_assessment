@@ -29,6 +29,39 @@ RSpec.describe Addresses::Resolve do
     end
   end
 
+  [ "350", "10118", "...", "New York" ].each do |input|
+    it "rejects incomplete input #{input.inspect} without a lookup" do
+      service = resolve(input)
+
+      expect(service).not_to be_success
+      expect(service.error_message).to include("Enter a full street address")
+      expect(client).not_to have_received(:geocode)
+    end
+  end
+
+  it "rejects a street-only match instead of treating it as a confirmed address" do
+    payload.first["address"].delete("house_number")
+
+    service = resolve
+    expect(service).not_to be_success
+    expect(service.location).to be_nil
+    expect(service.error_message).to include("complete street address could not be confirmed")
+  end
+
+  it "asks for clarification when matches belong to different ZIP codes" do
+    other = Marshal.load(Marshal.dump(payload.first))
+    other["address"]["postcode"] = "10001"
+    payload << other
+
+    expect(resolve.error_message).to include("Multiple locations found")
+  end
+
+  it "accepts duplicate matches within the same ZIP code" do
+    payload << payload.first.dup
+
+    expect(resolve).to be_success
+  end
+
   it "reports an address that could not be found" do
     payload.clear
 
